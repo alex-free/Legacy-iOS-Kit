@@ -5,6 +5,8 @@ device_rd_build="" # You can change the version of SSH Ramdisk and Pwned iBSS/iB
 device_bootargs_default="pio-error=0 debug=0x2014e serial=3"
 jelbrek="../resources/jailbreak"
 ssh_port=6414
+# Flag to not do the ramdisk_menu.
+boot_rd_only=false
 
 bash_test=$(echo -n 0)
 (( bash_test += 1 ))
@@ -616,7 +618,16 @@ install_depends() {
         xattr -cr ../bin/macos
         log "Installing Xcode Command Line Tools"
         xcode-select --install
-        print "* Make sure to install requirements from Homebrew/MacPorts: https://github.com/LukeZGD/Legacy-iOS-Kit/wiki/How-to-Use"
+        if command -v port > /dev/null; then
+            log "Installing MacPorts dependencies"
+            sudo port -N install bash curl git libusb
+        elif command -v brew > /dev/null; then
+            log "Installing Homebrew dependencies"
+            sudo brew install bash curl git libusb
+        else
+            echo "You need to install Homebrew or the MacPorts package manager."
+            exit 1
+        fi
         pause
     fi
 
@@ -634,8 +645,7 @@ install_depends() {
     fi
 
     log "Install script done! Please run the script again to proceed"
-    log "If your iOS device is plugged in, unplug and replug your device"
-    exit
+    read -p "If your iOS device is plugged in, unplug and replug your device. Then press return"
 }
 
 version_update_check() {
@@ -6024,7 +6034,9 @@ device_ramdisk64() {
     warn "Mounting and/or modifying data partition (/mnt2) might not work for 64-bit iOS"
     warn "Mount filesystems at your own risk: there is a chance of bootlooping! Especially on versions older than iOS 11.3."
 
-    menu_ramdisk $build_id
+    if [[ "$boot_rd_only" == "false" ]]; then
+        menu_ramdisk $build_id
+    fi
 }
 
 device_ramdisk() {
@@ -10253,6 +10265,10 @@ for i in "$@"; do
         "--exit-recovery" ) main_argmode="exitrecovery";;
         "--pwn" ) main_argmode="pwned-ibss";;
         "--sshrd" ) main_argmode="device_enter_ramdisk";;
+        "--sshrd-boot-rd-only" ) 
+            boot_rd_only=true
+            main_argmode="device_enter_ramdisk"
+        ;;
         "--sshrd-menu" )
             device_argmode="entry"
             main_argmode="device_enter_ramdisk_menu"

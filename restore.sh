@@ -612,23 +612,6 @@ install_depends() {
 
     elif [[ $distro == "void" ]]; then
         sudo xbps-install curl git patch openssh python3 unzip xxd zenity zip base-devel libffi-devel bzip2-devel openssl openssl-devel readline readline-devel sqlite-devel xz liblzma-devel zlib zlib-devel
-
-    elif [[ $platform == "macos" ]]; then
-        print "* Legacy iOS Kit will be installing dependencies and setting up permissions of tools"
-        xattr -cr ../bin/macos
-        log "Installing Xcode Command Line Tools"
-        xcode-select --install
-        if command -v port > /dev/null; then
-            log "Installing MacPorts dependencies"
-            sudo port -N install bash curl git libusb
-        elif command -v brew > /dev/null; then
-            log "Installing Homebrew dependencies"
-            sudo brew install bash curl git libusb
-        else
-            echo "You need to install Homebrew or the MacPorts package manager."
-            exit 1
-        fi
-        pause
     fi
 
     echo "$platform_ver" > "../resources/firstrun"
@@ -643,9 +626,6 @@ install_depends() {
         sudo udevadm control --reload-rules
         sudo udevadm trigger -s usb
     fi
-
-    log "Install script done! Please run the script again to proceed"
-    read -p "If your iOS device is plugged in, unplug and replug your device. Then press return"
 }
 
 version_update_check() {
@@ -1697,15 +1677,7 @@ device_dfuhelper() {
         return
     fi
     print "* DFU Mode Helper - Get ready to enter DFU mode."
-    print "* If you already know how to enter DFU mode, you may do so right now before continuing."
-    select_yesno "Select Y to continue, N to exit$rec" 1
-    if [[ $? != 1 ]]; then
-        if [[ -z $1 && $device_mode == "Recovery" ]]; then
-            log "Attempting to exit Recovery mode."
-            $irecovery -n
-        fi
-        exit
-    fi
+    read -p "Press enter to continue."
     device_find_all $1
     opt=$?
     if [[ $opt == 1 ]]; then

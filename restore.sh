@@ -570,11 +570,11 @@ install_depends() {
         print "* Enter your user password when prompted"
         if [[ $distro != "debian" && $distro != "fedora-atomic" ]]; then
             echo
-            warn "Before continuing, make sure that your system is fully updated first!"
-            echo "${color_Y}* This operation can result in a partial upgrade and may cause breakage if your system is not updated${color_N}"
+            #warn "Before continuing, make sure that your system is fully updated first!"
+            #echo "${color_Y}* This operation can result in a partial upgrade and may cause breakage if your system is not updated${color_N}"
             echo
         fi
-        pause
+
         prepare_udev_rules usbmux plugdev
     fi
 
@@ -612,6 +612,23 @@ install_depends() {
 
     elif [[ $distro == "void" ]]; then
         sudo xbps-install curl git patch openssh python3 unzip xxd zenity zip base-devel libffi-devel bzip2-devel openssl openssl-devel readline readline-devel sqlite-devel xz liblzma-devel zlib zlib-devel
+    
+    elif [[ $platform == "macos" ]]; then
+        print "* Legacy iOS Kit will be installing dependencies and setting up permissions of tools"
+        xattr -cr ../bin/macos
+        log "Installing Xcode Command Line Tools"
+        xcode-select --install
+
+        if command -v port > /dev/null; then
+            log "Installing MacPorts dependencies"
+            sudo port -N install bash curl git libusb
+        elif command -v brew > /dev/null; then
+            log "Installing Homebrew dependencies"
+            brew install bash curl git libusb
+        else
+            echo "You need to install Homebrew or the MacPorts package manager."
+            exit 1
+        fi
     fi
 
     echo "$platform_ver" > "../resources/firstrun"
@@ -626,6 +643,8 @@ install_depends() {
         sudo udevadm control --reload-rules
         sudo udevadm trigger -s usb
     fi
+
+    exit 0
 }
 
 version_update_check() {

@@ -587,19 +587,19 @@ install_depends() {
             sudo add-apt-repository -y universe
         fi
         sudo apt update
-        sudo apt install -m -y build-essential ca-certificates curl git ifuse libssl3 libssl-dev libxml2 libzstd1 openssh-client patch python3 unzip usbmuxd usbutils xxd zenity zip zlib1g-dev
+        sudo apt install -m -y build-essential ca-certificates curl git ifuse libssl3 libssl-dev libxml2 libzstd1 openssh-client patch python3 unzip usbmuxd usbutils xxd zenity zip zlib1g-dev expect idevicerestore irecovery
         if [[ $(command -v systemctl 2>/dev/null) ]]; then
             sudo systemctl enable --now udev systemd-udevd usbmuxd 2>/dev/null
         fi
 
     elif [[ $distro == "fedora" ]]; then
-        sudo dnf install -y ca-certificates git ifuse libimobiledevice libxml2 libzstd openssl openssl-devel patch python3 systemd udev usbmuxd vim-common zenity zip zlib-devel
+        sudo dnf install -y ca-certificates git ifuse libimobiledevice libxml2 libzstd openssl openssl-devel patch python3 systemd udev usbmuxd vim-common zenity zip zlib-devel expect idevicerestore irecovery
         sudo dnf group install -y c-development
         sudo ln -sf /etc/pki/tls/certs/ca-bundle.crt /etc/pki/tls/certs/ca-certificates.crt
         prepare_udev_rules root usbmuxd
 
     elif [[ $distro == "fedora-atomic" ]]; then
-        rpm-ostree install patch vim-common zenity
+        rpm-ostree install patch vim-common zenity expect idevicerestore irecovery
         print "* You may need to reboot to apply changes with rpm-ostree. Perform a reboot after this before running the script again."
 
     elif [[ $distro == "opensuse" ]]; then
@@ -613,6 +613,7 @@ install_depends() {
     elif [[ $distro == "void" ]]; then
         sudo xbps-install curl git patch openssh python3 unzip xxd zenity zip base-devel libffi-devel bzip2-devel openssl openssl-devel readline readline-devel sqlite-devel xz liblzma-devel zlib zlib-devel
     
+    # Expect command is already available in base BSD Subsystem.
     elif [[ $platform == "macos" ]]; then
         print "* Legacy iOS Kit will be installing dependencies and setting up permissions of tools"
         xattr -cr ../bin/macos
@@ -1696,7 +1697,7 @@ device_dfuhelper() {
         return
     fi
     print "* DFU Mode Helper - Get ready to enter DFU mode."
-    read -p "Press enter to continue."
+    read -p "Press any key to continue."
     device_find_all $1
     opt=$?
     if [[ $opt == 1 ]]; then
@@ -7005,9 +7006,6 @@ shsh_save_cydia() {
 }
 
 menu_print_info() {
-    if [[ $debug_mode != 1 ]]; then
-        clear
-    fi
     print " *** Legacy iOS Kit ***"
     print " - Script by LukeZGD -"
     echo
@@ -9781,7 +9779,6 @@ device_enter_ramdisk() {
     fi
 
     if [[ $1 == "menu" ]]; then
-        clear
         device_iproxy
         device_sshpass alpine
         menu_ramdisk
@@ -10096,7 +10093,6 @@ device_erase() {
 }
 
 main() {
-    clear
     print " *** Legacy iOS Kit ***"
     print " - Script by LukeZGD -"
     echo

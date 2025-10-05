@@ -10102,9 +10102,9 @@ main() {
     echo
     version_get
 
-    if [[ $EUID == 0 && $run_as_root != 1 ]]; then
-        error "Running the script as root is not allowed."
-    fi
+    #if [[ $EUID == 0 && $run_as_root != 1 ]]; then
+    #    error "Running the script as root is not allowed."
+    #fi
 
     if [[ ! -d "../resources" ]]; then
         error "The resources folder cannot be found. Replace resources folder and try again." \

@@ -587,19 +587,19 @@ install_depends() {
             sudo add-apt-repository -y universe
         fi
         sudo apt update
-        sudo apt install -m -y build-essential ca-certificates curl git ifuse libssl3 libssl-dev libxml2 libzstd1 openssh-client patch python3 unzip usbmuxd usbutils xxd zenity zip zlib1g-dev expect idevicerestore irecovery
+        sudo apt install -m -y build-essential ca-certificates curl git ifuse libssl3 libssl-dev libxml2 libzstd1 openssh-client patch python3 unzip usbmuxd usbutils xxd zenity zip zlib1g-dev
         if [[ $(command -v systemctl 2>/dev/null) ]]; then
             sudo systemctl enable --now udev systemd-udevd usbmuxd 2>/dev/null
         fi
 
     elif [[ $distro == "fedora" ]]; then
-        sudo dnf install -y ca-certificates git ifuse libimobiledevice libxml2 libzstd openssl openssl-devel patch python3 systemd udev usbmuxd vim-common zenity zip zlib-devel expect idevicerestore irecovery
+        sudo dnf install -y ca-certificates git ifuse libimobiledevice libxml2 libzstd openssl openssl-devel patch python3 systemd udev usbmuxd vim-common zenity zip zlib-devel
         sudo dnf group install -y c-development
         sudo ln -sf /etc/pki/tls/certs/ca-bundle.crt /etc/pki/tls/certs/ca-certificates.crt
         prepare_udev_rules root usbmuxd
 
     elif [[ $distro == "fedora-atomic" ]]; then
-        rpm-ostree install patch vim-common zenity expect idevicerestore irecovery
+        rpm-ostree install patch vim-common zenity
         print "* You may need to reboot to apply changes with rpm-ostree. Perform a reboot after this before running the script again."
 
     elif [[ $distro == "opensuse" ]]; then
